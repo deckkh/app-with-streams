@@ -31,14 +31,20 @@ public class App {
 
     // read from the source topic, "users"
     KStream<Void, String> stream = builder.stream("users");
+     KStream<Void, String> login = builder.stream("login");
 
     // for each record that appears in the source topic,
     // print the value
     stream.foreach(
         (key, value) -> {
-          System.out.println("(DSL) Hello, " + value);
+          System.out.println("(User) Hello, " + value);
         });
 
+         login.foreach(
+             (key, value) -> {
+               System.out.println("(Login) Hello, " + value);
+             });
+    
     // you can also print using the `print` operator
     // stream.print(Printed.<String, String>toSysOut().withLabel("source"));
 
