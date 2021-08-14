@@ -3,12 +3,24 @@
  */
 package app.with.streams;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class App {
+
+    private static final Logger logger = LogManager.getLogger(App.class.getName());
+
+
     public String getGreeting() {
         return "Hello World!";
     }
 
     public static void main(String[] args) {
+
         System.out.println(new App().getGreeting());
+
+        logger.info("Info: Log4j2 Usage");
+        logger.debug("Debug: Program has finished successfully");
+        logger.error("Error: Program has errors");
     }
 }
