@@ -8,12 +8,15 @@
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
+    id 'java'
     id 'application'
 }
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+        // Use Maven Central for resolving dependencies.
+    jcenter()
 }
 
 dependencies {
@@ -28,6 +31,9 @@ dependencies {
 
     // required for JSON serializer
     implementation 'com.google.code.gson:gson:2.8.7'
+
+        // This dependency is used by the application.
+    implementation 'org.apache.kafka:kafka-streams:2.7.0'
 }
 
 application {

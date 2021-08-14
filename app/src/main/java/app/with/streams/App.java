@@ -5,21 +5,28 @@ package app.with.streams;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.kstream.KStream;
 
 public class App {
 
     private static final Logger logger = LogManager.getLogger(App.class.getName());
 
 
-    public String getGreeting() {
-        return "Hello World!";
-    }
 
     public static void main(String[] args) {
 
-        System.out.println(new App().getGreeting());
 
         logger.info("Info: Log4j2 Usage");
+
+
+        StreamsBuilder builder = new StreamsBuilder();
+
+        KStream<Void,String> stream = builder.stream("users");
+
+
+        System.out.println("hello");
+
         logger.debug("Debug: Program has finished successfully");
         logger.error("Error: Program has errors");
     }
