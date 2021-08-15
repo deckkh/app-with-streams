@@ -1,5 +1,5 @@
-docker-compose up -d
 docker-compose down
+docker-compose up -d
 docker-compose exec kafka bash
 
 
@@ -7,13 +7,15 @@ docker-compose exec kafka bash
 
 kafka-streams-application-reset --application-id dev1  --to-earliest --input-topics users,login
 
-kafka-topics --list --bootstrap-server localhost:9092
+
+
+kafka-topics --delete --topic users --bootstrap-server localhost:9092 
+kafka-topics --delete --topic login --bootstrap-server localhost:9092
 
 kafka-topics --create --topic users --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 kafka-topics --create --topic login --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 
-kafka-topics --delete --topic users --bootstrap-server localhost:9092 
-kafka-topics --delete --topic login --bootstrap-server localhost:9092
+kafka-topics --list --bootstrap-server localhost:9092
 
 echo {  'Id' : 1,  'Server' : 'srv1' }| kafka-console-producer --bootstrap-server localhost:9092 --topic login 
 echo {  'Id' : 1,  'Name' : 'user1' }| kafka-console-producer --bootstrap-server localhost:9092 --topic users 
