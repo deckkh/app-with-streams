@@ -7,10 +7,15 @@ import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import app.with.streams.serialization.*;
+
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.serialization.Serdes.VoidSerde;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
@@ -29,9 +34,13 @@ public class App {
     // the builder is used to construct the topology
     StreamsBuilder builder = new StreamsBuilder();
 
+    UserSerdes userSerdes = new UserSerdes();
+    LoginSerdes loginSerdes = new LoginSerdes();
+    VoidSerde voidSerde = new VoidSerde();
+
     // read from the source topic, "users"
-    KStream<Void, String> stream = builder.stream("users");
-     KStream<Void, String> login = builder.stream("login");
+    KStream<Void, User> stream = builder.stream("users",Consumed.with(voidSerde, userSerdes));
+     KStream<Void, Login> login = builder.stream("login",Consumed.with(voidSerde, loginSerdes));
 
     // for each record that appears in the source topic,
     // print the value
