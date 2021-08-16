@@ -3,6 +3,7 @@
  */
 package app.with.streams;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +30,17 @@ public class App {
 
 
         logger.info("Info: Log4j2 Usage");
+
+        MyProperties prop = new MyProperties();
+
+        try {
+          Properties externalProps = prop.getPropValues();
+
+          
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
 
 
     // the builder is used to construct the topology
