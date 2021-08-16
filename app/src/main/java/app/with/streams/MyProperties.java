@@ -13,11 +13,20 @@ public class MyProperties {
 
     private static final Logger logger = LogManager.getLogger(MyProperties.class.getName());
 
- 
-	public Properties getPropValues() throws IOException 
+    private Properties prop;
+
+
+    public String getPropValue(String key)
+    {
+        return prop.getProperty(key);
+	}
+    
+
+
+	public void getPropValues() throws IOException 
     {
  
-        Properties prop = new Properties();
+        prop = new Properties();
 		try {
 			String propFileName = "config.properties";
 
@@ -38,6 +47,5 @@ public class MyProperties {
 		} finally {
 			inputStream.close();
 		}
-		return prop;
 	}
 }

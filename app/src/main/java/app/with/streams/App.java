@@ -34,9 +34,13 @@ public class App {
         MyProperties prop = new MyProperties();
 
         try {
-          Properties externalProps = prop.getPropValues();
+          prop.getPropValues();
 
-          
+          String user = prop.getPropValue("user");
+
+          System.out.println(user);
+
+
         } catch (IOException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
