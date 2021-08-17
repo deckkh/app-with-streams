@@ -17,7 +17,12 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.GlobalKTable;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KeyValueMapper;
+import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.ValueJoiner;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 public class App {
@@ -50,24 +55,60 @@ public class App {
 
 
           // read from the source topic, "users"
-          KStream<Void, User> stream = builder.stream(prop.getPropValue("stream-users"),Consumed.with(voidSerde, userSerdes));
-          KStream<Void, Login> login = builder.stream(prop.getPropValue("stream-login"),Consumed.with(voidSerde, loginSerdes));
+          // KStream<Void, User> stream = builder.stream(prop.getPropValue("stream-users"),Consumed.with(voidSerde, userSerdes));
 
 
-          KStream<Void, User> onlyPositives = stream.filterNot((key, value) -> value.getId() == 0);
+    // register the score events stream
+    KStream<String, User> stream =
+        builder
+            .stream("users", 
+            Consumed.with(voidSerde, userSerdes))
+            // now marked for re-partitioning
+            .selectKey((k, v) -> v.getId().toString());;
 
           // for each record that appears in the source topic,
           // print the value
-          onlyPositives.foreach(
+          stream.foreach(
               (key, value) -> {
                 System.out.println("(User) Hello, " + value.getName());
               });
+
+         stream.to("mytopic", Produced.with(Serdes.String(),userSerdes));
+
+
+         ValueJoiner<Login, User, LoginUser> productJoiner =
+         (mylogin, myuser) -> new LoginUser(myuser.getId(),myuser.getName(),mylogin.getServer());
+
+          KStream<String, Login> login = builder.stream(prop.getPropValue("stream-login"),
+          Consumed.with(Serdes.String(), loginSerdes)).selectKey((k,v) -> v.getId().toString());
+
+
+//          KStream<Void, User> onlyPositives = stream.filterNot((key, value) -> value.getId() == 0);
+
+
+        GlobalKTable<String, User> joinTable = builder.globalTable("mytopic",Consumed.with(Serdes.String(), userSerdes));
+
+
+
 
               login.foreach(
                   (key, value) -> {
                     System.out.println("(Login) Hello, " + value.getServer());
                   });
-          
+
+          KeyValueMapper<String,Login,String> keyMapper = (leftKey,mylogin) -> { 
+            return String.valueOf(mylogin.getId().toString());
+          };
+
+
+          KStream<String,LoginUser> withLogin = login.join(joinTable, keyMapper, productJoiner);
+
+          withLogin.foreach(
+            (key, value) -> {
+              System.out.println("(LoginUser) Hello, " + value.getServer()+ " from "+value.getUser());
+            });
+
+
           // you can also print using the `print` operator
           // stream.print(Printed.<String, String>toSysOut().withLabel("source"));
 

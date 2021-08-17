@@ -53,3 +53,5 @@ kafka-topics --list --bootstrap-server localhost:9092
 
 echo {  'Id' : 1,  'Server' : 'srv1' }| kafka-console-producer --bootstrap-server localhost:9092 --topic login 
 echo {  'Id' : 1,  'Name' : 'user1' }| kafka-console-producer --bootstrap-server localhost:9092 --topic users 
+
+kafka-console-consumer --bootstrap-server localhost:9092 --topic users --from-beginning --property print.key=true --property key.separator="-"
