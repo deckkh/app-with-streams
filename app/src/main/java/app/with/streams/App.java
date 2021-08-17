@@ -47,20 +47,25 @@ public class App {
           LoginSerdes loginSerdes = new LoginSerdes();
           VoidSerde voidSerde = new VoidSerde();
 
+
+
           // read from the source topic, "users"
           KStream<Void, User> stream = builder.stream(prop.getPropValue("stream-users"),Consumed.with(voidSerde, userSerdes));
           KStream<Void, Login> login = builder.stream(prop.getPropValue("stream-login"),Consumed.with(voidSerde, loginSerdes));
 
+
+          KStream<Void, User> onlyPositives = stream.filterNot((key, value) -> value.getId() == 0);
+
           // for each record that appears in the source topic,
           // print the value
-          stream.foreach(
+          onlyPositives.foreach(
               (key, value) -> {
-                System.out.println("(User) Hello, " + value);
+                System.out.println("(User) Hello, " + value.getName());
               });
 
               login.foreach(
                   (key, value) -> {
-                    System.out.println("(Login) Hello, " + value);
+                    System.out.println("(Login) Hello, " + value.getServer());
                   });
           
           // you can also print using the `print` operator
